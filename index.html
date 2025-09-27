@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Latihan Soal Perbandingan</title>
-    <!-- Memuat library Chart.js untuk grafik -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -113,7 +112,7 @@
             border-radius: 10px;
             padding: 20px;
             text-align: left;
-            margin: 30px 0;
+            margin: 20px 0;
             line-height: 1.6;
         }
 
@@ -124,9 +123,15 @@
             padding-bottom: 10px;
             margin-bottom: 15px;
         }
+        
+        #start-screen h3 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
 
         .toggle-buttons {
-            margin: 20px 0;
+            margin: 10px 0;
             display: flex;
             justify-content: center;
             gap: 10px;
@@ -208,7 +213,6 @@
             align-content: start;
         }
         
-        /* Custom scrollbar */
         #questions-container::-webkit-scrollbar,
         #review-container::-webkit-scrollbar {
             width: 8px;
@@ -223,7 +227,7 @@
             background: var(--accent-color);
             border-radius: 10px;
         }
-       
+        
         .question-row {
             display: flex;
             justify-content: space-between;
@@ -267,20 +271,47 @@
 
         /* Tampilan Hasil */
         #results-screen {
-            justify-content: center;
+            justify-content: flex-start;
         }
         #results-screen h1 {
             text-align: center;
             color: var(--accent-color);
             font-size: 2.2rem;
+            margin-top: 0;
+            margin-bottom: 15px;
         }
         
+        /* CSS BARU: Style untuk area ringkasan */
+        #results-summary {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        #results-summary h3 {
+            margin-top: 5px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+        #results-summary ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        #results-summary li {
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 0;
+            flex-grow: 1;
             overflow-y: auto;
+            padding: 5px;
         }
 
         .chart-container {
@@ -288,12 +319,13 @@
             padding: 20px;
             border-radius: 10px;
         }
-
+        
         .results-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 15px;
+            flex-shrink: 0;
         }
 
         /* Tampilan Tinjauan */
@@ -312,15 +344,15 @@
             box-shadow: 0 0 0 2px var(--text-color);
         }
         #review-screen .answer-buttons button.correct-answer {
-             background-color: var(--correct-color);
-             color: white;
-             border-color: var(--correct-color);
+              background-color: var(--correct-color);
+              color: white;
+              border-color: var(--correct-color);
         }
         #review-screen .answer-buttons button.user-answer.incorrect-answer {
-             background-color: var(--incorrect-color);
-             color: white;
-             border-color: var(--incorrect-color);
-             box-shadow: none;
+              background-color: var(--incorrect-color);
+              color: white;
+              border-color: var(--incorrect-color);
+              box-shadow: none;
         }
 
         /* Utility */
@@ -331,7 +363,7 @@
         /* Responsive untuk Mobile */
         @media (max-width: 768px) {
             .charts-grid {
-                grid-template-columns: 1fr; /* Stack charts on tablets */
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             }
         }
 
@@ -360,7 +392,7 @@
                 font-size: 1.8rem;
             }
             #questions-container, #review-container {
-                grid-template-columns: 1fr; /* Single column layout for phones */
+                grid-template-columns: 1fr;
                 gap: 10px;
             }
             .question-row {
@@ -388,7 +420,6 @@
 <body>
 
     <div class="container">
-        <!-- Tampilan Password -->
         <div id="password-screen" class="screen">
             <h2>Masukkan Password</h2>
             <input type="password" id="password-input" placeholder="••••••••••">
@@ -396,46 +427,55 @@
             <button id="password-submit-btn" class="btn">Masuk</button>
         </div>
 
-        <!-- Tampilan Awal -->
         <div id="start-screen" class="screen hidden">
             <h1>Latihan Soal Perbandingan</h1>
             <div class="instructions">
                 <h2>Langkah Pengerjaan</h2>
                 <ol>
                     <li>Pilih mode pengerjaan: <strong>Acak</strong> atau <strong>Tidak Acak</strong>.</li>
+                    <li>Pilih durasi waktu untuk setiap bagian.</li>
                     <li>Tekan tombol <strong>Mulai</strong> untuk memulai.</li>
-                    <li>Ada <strong>4 bagian</strong> soal, masing-masing berisi 500 soal.</li>
-                    <li>Waktu untuk setiap bagian adalah <strong>30 detik</strong>.</li>
+                    <li>Ada <strong>4 bagian</strong> soal.</li>
                     <li>Pilih jawaban ( &lt;, =, &gt; ). Anda dapat mengubah jawaban selama waktu masih ada.</li>
-                    <li>Setelah semua bagian selesai, Anda dapat melihat grafik hasil dan meninjau jawaban Anda.</li>
+                    <li>Setelah semua bagian selesai, Anda dapat melihat ringkasan, grafik hasil, dan meninjau jawaban Anda.</li>
                 </ol>
             </div>
+            
+            <h3>Pilih Mode Soal</h3>
             <div class="toggle-buttons">
                 <button id="shuffle-on-btn" class="btn active">Acak</button>
                 <button id="shuffle-off-btn" class="btn">Tidak Acak</button>
             </div>
+
+            <h3>Pilih Durasi per Bagian</h3>
+            <div class="toggle-buttons">
+                <button id="duration-30-btn" class="btn active">30 Detik</button>
+                <button id="duration-60-btn" class="btn">1 Menit</button>
+            </div>
+            
             <button id="start-btn" class="btn">Mulai</button>
         </div>
 
-        <!-- Tampilan Kuis -->
         <div id="quiz-screen" class="screen hidden">
             <div class="quiz-header">
                 <h2 id="bagian-title">Bagian 1</h2>
                 <div id="timer">30</div>
             </div>
             <div id="questions-container">
-                <!-- Soal akan dimuat di sini oleh JavaScript -->
-            </div>
+                </div>
         </div>
 
-        <!-- Tampilan Hasil -->
         <div id="results-screen" class="screen hidden">
             <h1>Hasil Pengerjaan</h1>
+            
+            <div id="results-summary"></div>
+
             <div class="charts-grid">
                 <div class="chart-container"><canvas id="chart-bagian1"></canvas></div>
                 <div class="chart-container"><canvas id="chart-bagian2"></canvas></div>
                 <div class="chart-container"><canvas id="chart-bagian3"></canvas></div>
                 <div class="chart-container"><canvas id="chart-bagian4"></canvas></div>
+                <div class="chart-container"><canvas id="chart-total"></canvas></div>
             </div>
             <div class="results-buttons">
                 <button id="review-btn" class="btn">Lihat Hasil Jawaban</button>
@@ -443,15 +483,13 @@
             </div>
         </div>
         
-        <!-- Tampilan Tinjauan Jawaban -->
         <div id="review-screen" class="screen hidden">
             <div class="quiz-header">
                 <h2 id="review-title">Tinjauan Jawaban</h2>
                 <button id="back-to-results-btn" class="btn">Kembali ke Hasil</button>
             </div>
             <div id="review-container">
-                <!-- Hasil Tinjauan akan dimuat di sini -->
-            </div>
+                </div>
         </div>
     </div>
 
@@ -2479,14 +2517,18 @@
         const reviewBtn = document.getElementById('review-btn');
         const backToResultsBtn = document.getElementById('back-to-results-btn');
 
+        const duration30Btn = document.getElementById('duration-30-btn');
+        const duration60Btn = document.getElementById('duration-60-btn');
+
         const questionsContainer = document.getElementById('questions-container');
         const reviewContainer = document.getElementById('review-container');
         const bagianTitle = document.getElementById('bagian-title');
         const timerDisplay = document.getElementById('timer');
 
-        const QUESTIONS_PER_SECTION = 500;
-        const TIME_PER_SECTION = 30;
+        const QUESTIONS_PER_SECTION = 50; // Disesuaikan dengan jumlah soal yang ada
         const TOTAL_SECTIONS = 4;
+        
+        let timePerSection = 30; 
 
         let allQuestions = [];
         let currentSection = 0;
@@ -2513,6 +2555,10 @@
 
         // Fungsi mem-parsing soal
         function parseQuestions() {
+            if (!rawQuestions || rawQuestions.trim() === '') {
+                 allQuestions = [];
+                 return;
+            }
             const lines = rawQuestions.trim().split('\n');
             allQuestions = lines.map((line, index) => {
                 const parts = line.split('<=>');
@@ -2530,9 +2576,8 @@
             questionsContainer.scrollTop = 0;
             bagianTitle.textContent = `Bagian ${sectionIndex + 1}`;
             
-            const startIndex = sectionIndex * QUESTIONS_PER_SECTION;
-            const endIndex = startIndex + QUESTIONS_PER_SECTION;
-            let sectionQuestions = allQuestions.slice(startIndex, endIndex);
+            // Karena soalnya hanya 50, kita akan gunakan 50 soal yang sama di setiap bagian
+            let sectionQuestions = allQuestions.slice();
 
             if (isShuffled) {
                 shuffleArray(sectionQuestions);
@@ -2576,7 +2621,7 @@
 
         // Fungsi timer
         function startTimer() {
-            let timeLeft = TIME_PER_SECTION;
+            let timeLeft = timePerSection;
             timerDisplay.textContent = timeLeft;
 
             timerInterval = setInterval(() => {
@@ -2608,11 +2653,9 @@
             const userAnswer = selectedButton.dataset.answer;
             const questionId = parseInt(selectedButton.dataset.questionId);
             
-            // Simpan jawaban
             userAnswers[questionId] = userAnswer;
             answeredInSection[currentSection].add(questionId);
 
-            // Update tampilan tombol
             const buttonGroup = selectedButton.parentElement;
             Array.from(buttonGroup.children).forEach(button => button.classList.remove('selected'));
             selectedButton.classList.add('selected');
@@ -2625,6 +2668,36 @@
             activeCharts.forEach(chart => chart.destroy());
             activeCharts = [];
 
+            // JAVASCRIPT BARU: Logika untuk membuat ringkasan poin-poin
+            const summaryContainer = document.getElementById('results-summary');
+            let summaryHTML = '<h3>Ringkasan Hasil</h3><ul>';
+
+            results.forEach((result, index) => {
+                summaryHTML += `<li>
+                    <strong>Bagian ${index + 1}:</strong> 
+                    Dikerjakan: ${result.answered}, 
+                    Benar: ${result.correct}, 
+                    Salah: ${result.incorrect}, 
+                    Total Soal: ${allQuestions.length}
+                </li>`;
+            });
+            
+            const totalAnswered = results.reduce((sum, result) => sum + result.answered, 0);
+            const totalCorrect = results.reduce((sum, result) => sum + result.correct, 0);
+            const totalIncorrect = results.reduce((sum, result) => sum + result.incorrect, 0);
+
+            summaryHTML += `<hr><li>
+                <strong>Total Keseluruhan:</strong> 
+                Dikerjakan: ${totalAnswered}, 
+                Benar: ${totalCorrect}, 
+                Salah: ${totalIncorrect}
+            </li>`;
+
+            summaryHTML += '</ul>';
+            summaryContainer.innerHTML = summaryHTML;
+
+
+            // Grafik per bagian
             results.forEach((result, index) => {
                 const ctx = document.getElementById(`chart-bagian${index + 1}`).getContext('2d');
                 const newChart = new Chart(ctx, {
@@ -2646,6 +2719,30 @@
                 });
                 activeCharts.push(newChart);
             });
+
+            // Grafik Total
+            const ctxTotal = document.getElementById('chart-total').getContext('2d');
+            const totalChart = new Chart(ctxTotal, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Dikerjakan', 'Total Benar', 'Total Salah'],
+                    datasets: [{
+                        label: 'Statistik Keseluruhan',
+                        data: [totalAnswered, totalCorrect, totalIncorrect],
+                        backgroundColor: ['#6366f1', '#22c55e', '#ef4444'],
+                        borderColor: ['#4f46e5', '#16a34a', '#dc2626'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true, ticks: { color: '#1e293b' } }, x: { ticks: { color: '#1e293b' } } },
+                    plugins: { 
+                        title: { display: true, text: 'Hasil Akhir Keseluruhan', color: '#1e293b', font: { size: 16 }},
+                        legend: { display: false }
+                    }
+                }
+            });
+            activeCharts.push(totalChart);
         }
         
         // Fungsi menampilkan tinjauan
@@ -2657,7 +2754,9 @@
             const answeredQuestionIds = Object.keys(userAnswers).map(Number).sort((a, b) => a - b);
 
             answeredQuestionIds.forEach(questionId => {
-                const q = allQuestions[questionId];
+                const q = allQuestions.find(ques => ques.id === questionId);
+                if (!q) return; 
+
                 const userAnswer = userAnswers[q.id];
                 const isCorrect = userAnswer === q.answer;
                 
@@ -2675,7 +2774,6 @@
                     <span class="expression">${q.right}</span>
                 `;
                 
-                // Tandai jawaban benar dan jawaban user
                 const buttons = questionRow.querySelectorAll('.answer-buttons button');
                 buttons.forEach(btn => {
                     const symbol = btn.dataset.symbol;
@@ -2706,7 +2804,7 @@
         // Fungsi cek password
         function checkPassword() {
             const password = passwordInput.value;
-            if (password === 'dhikasatya') {
+            if (password === 'dhikasatya','S7') {
                 showScreen('start');
             } else {
                 passwordInput.classList.add('error');
@@ -2718,7 +2816,7 @@
         passwordSubmitBtn.addEventListener('click', checkPassword);
         passwordInput.addEventListener('keyup', (e) => {
              if (e.key === 'Enter') {
-                checkPassword();
+                 checkPassword();
              }
         });
         passwordInput.addEventListener('input', () => {
@@ -2746,6 +2844,18 @@
             shuffleOffBtn.classList.add('active');
             shuffleOnBtn.classList.remove('active');
         });
+        
+        duration30Btn.addEventListener('click', () => {
+            timePerSection = 30;
+            duration30Btn.classList.add('active');
+            duration60Btn.classList.remove('active');
+        });
+
+        duration60Btn.addEventListener('click', () => {
+            timePerSection = 60;
+            duration60Btn.classList.add('active');
+            duration30Btn.classList.remove('active');
+        });
 
         questionsContainer.addEventListener('click', handleAnswer);
         
@@ -2756,9 +2866,8 @@
 
         // Inisialisasi
         parseQuestions();
-        showScreen('password'); // Mulai dari layar password
+        showScreen('password');
     </script>
 
 </body>
 </html>
-
