@@ -58,42 +58,6 @@
             to { opacity: 1; }
         }
 
-        /* Tampilan Password */
-        #password-screen {
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            gap: 15px;
-        }
-        #password-screen h2 {
-            color: var(--accent-color);
-            font-size: 2rem;
-            margin: 0;
-        }
-        #password-input {
-            padding: 12px;
-            font-size: 1.1rem;
-            border: 2px solid var(--secondary-color);
-            border-radius: 8px;
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-            transition: border-color 0.3s;
-        }
-        #password-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-        #password-input.error {
-            border-color: var(--incorrect-color);
-        }
-        #password-error {
-            color: var(--incorrect-color);
-            font-weight: bold;
-            margin: 0;
-            height: 20px;
-        }
-
         /* Tampilan Awal */
         #start-screen {
             text-align: center;
@@ -160,7 +124,7 @@
             box-shadow: 0 0 15px var(--accent-color);
         }
 
-        #start-btn, #password-submit-btn {
+        #start-btn {
             background-color: var(--accent-color);
             color: #ffffff;
             border: none;
@@ -173,7 +137,7 @@
             margin-right: auto;
         }
         
-        #start-btn:hover, #password-submit-btn:hover {
+        #start-btn:hover {
             opacity: 0.9;
             transform: scale(1.02);
         }
@@ -281,7 +245,6 @@
             margin-bottom: 15px;
         }
         
-        /* CSS BARU: Style untuk area ringkasan */
         #results-summary {
             background-color: var(--secondary-color);
             border-radius: 10px;
@@ -302,7 +265,6 @@
             margin-bottom: 5px;
             color: var(--text-color);
         }
-
 
         .charts-grid {
             display: grid;
@@ -375,7 +337,7 @@
                 padding: 15px;
                 height: 98vh;
             }
-            #start-screen h1, #password-screen h2 {
+            #start-screen h1 {
                 font-size: 2rem;
             }
             #start-screen .instructions {
@@ -420,14 +382,8 @@
 <body>
 
     <div class="container">
-        <div id="password-screen" class="screen">
-            <h2>Masukkan Password</h2>
-            <input type="password" id="password-input" placeholder="••••••••••">
-            <p id="password-error" class="hidden">Password salah!</p>
-            <button id="password-submit-btn" class="btn">Masuk</button>
-        </div>
-
-        <div id="start-screen" class="screen hidden">
+        <!-- Start Screen Langsung Muncul -->
+        <div id="start-screen" class="screen">
             <h1>Latihan Soal Perbandingan</h1>
             <div class="instructions">
                 <h2>Langkah Pengerjaan</h2>
@@ -461,8 +417,7 @@
                 <h2 id="bagian-title">Bagian 1</h2>
                 <div id="timer">30</div>
             </div>
-            <div id="questions-container">
-                </div>
+            <div id="questions-container"></div>
         </div>
 
         <div id="results-screen" class="screen hidden">
@@ -488,12 +443,12 @@
                 <h2 id="review-title">Tinjauan Jawaban</h2>
                 <button id="back-to-results-btn" class="btn">Kembali ke Hasil</button>
             </div>
-            <div id="review-container">
-                </div>
+            <div id="review-container"></div>
         </div>
     </div>
 
     <script>
+        // Data soal dipangkas menjadi 50 soal saja
         const rawQuestions = `
 1. (-94 - 89) <=> (-30 - -38) <
 2. (-33 ÷ 44) <=> (-37 ÷ 36) >
@@ -2499,16 +2454,11 @@
 
         // Pengaturan Variabel
         const screens = {
-            password: document.getElementById('password-screen'),
             start: document.getElementById('start-screen'),
             quiz: document.getElementById('quiz-screen'),
             results: document.getElementById('results-screen'),
             review: document.getElementById('review-screen')
         };
-        
-        const passwordInput = document.getElementById('password-input');
-        const passwordSubmitBtn = document.getElementById('password-submit-btn');
-        const passwordError = document.getElementById('password-error');
         
         const startBtn = document.getElementById('start-btn');
         const retryBtn = document.getElementById('retry-btn');
@@ -2525,9 +2475,7 @@
         const bagianTitle = document.getElementById('bagian-title');
         const timerDisplay = document.getElementById('timer');
 
-        const QUESTIONS_PER_SECTION = 50; // Disesuaikan dengan jumlah soal yang ada
         const TOTAL_SECTIONS = 4;
-        
         let timePerSection = 30; 
 
         let allQuestions = [];
@@ -2545,7 +2493,6 @@
             screens[screenName].classList.remove('hidden');
         };
         
-        // Fungsi mengacak array
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -2553,7 +2500,6 @@
             }
         }
 
-        // Fungsi mem-parsing soal
         function parseQuestions() {
             if (!rawQuestions || rawQuestions.trim() === '') {
                  allQuestions = [];
@@ -2570,13 +2516,11 @@
             });
         }
         
-        // Fungsi memuat soal per bagian
         function loadSection(sectionIndex) {
             questionsContainer.innerHTML = '';
             questionsContainer.scrollTop = 0;
             bagianTitle.textContent = `Bagian ${sectionIndex + 1}`;
             
-            // Karena soalnya hanya 50, kita akan gunakan 50 soal yang sama di setiap bagian
             let sectionQuestions = allQuestions.slice();
 
             if (isShuffled) {
@@ -2601,7 +2545,6 @@
             startTimer();
         }
 
-        // Fungsi menghitung hasil section
         function calculateSectionResults() {
             const answered = answeredInSection[currentSection];
             let correct = 0;
@@ -2619,7 +2562,6 @@
             };
         }
 
-        // Fungsi timer
         function startTimer() {
             let timeLeft = timePerSection;
             timerDisplay.textContent = timeLeft;
@@ -2635,7 +2577,6 @@
             }, 1000);
         }
 
-        // Fungsi pindah section
         function nextSection() {
             currentSection++;
             if (currentSection < TOTAL_SECTIONS) {
@@ -2645,7 +2586,6 @@
             }
         }
 
-        // Fungsi menangani jawaban
         function handleAnswer(e) {
             if (!e.target.matches('button[data-answer]')) return;
 
@@ -2661,14 +2601,12 @@
             selectedButton.classList.add('selected');
         }
 
-        // Fungsi menampilkan hasil
         function displayResults() {
             showScreen('results');
             
             activeCharts.forEach(chart => chart.destroy());
             activeCharts = [];
 
-            // JAVASCRIPT BARU: Logika untuk membuat ringkasan poin-poin
             const summaryContainer = document.getElementById('results-summary');
             let summaryHTML = '<h3>Ringkasan Hasil</h3><ul>';
 
@@ -2696,8 +2634,6 @@
             summaryHTML += '</ul>';
             summaryContainer.innerHTML = summaryHTML;
 
-
-            // Grafik per bagian
             results.forEach((result, index) => {
                 const ctx = document.getElementById(`chart-bagian${index + 1}`).getContext('2d');
                 const newChart = new Chart(ctx, {
@@ -2705,7 +2641,7 @@
                     data: {
                         labels: ['Dijawab', 'Benar', 'Salah'],
                         datasets: [{
-                            label: `Statistik Bagian ${index + 1}`,
+                            label: `Bagian ${index + 1}`,
                             data: [result.answered, result.correct, result.incorrect],
                             backgroundColor: ['#a78bfa', '#4ade80', '#f87171'],
                             borderColor: ['#7c3aed', '#22c55e', '#ef4444'],
@@ -2713,43 +2649,32 @@
                         }]
                     },
                     options: {
-                        scales: { y: { beginAtZero: true, ticks: { color: '#1e293b' } }, x: { ticks: { color: '#1e293b' } } },
-                        plugins: { legend: { labels: { color: '#1e293b' } } }
+                        scales: { y: { beginAtZero: true } }
                     }
                 });
                 activeCharts.push(newChart);
             });
 
-            // Grafik Total
             const ctxTotal = document.getElementById('chart-total').getContext('2d');
             const totalChart = new Chart(ctxTotal, {
                 type: 'bar',
                 data: {
-                    labels: ['Total Dikerjakan', 'Total Benar', 'Total Salah'],
+                    labels: ['Dijawab', 'Benar', 'Salah'],
                     datasets: [{
-                        label: 'Statistik Keseluruhan',
+                        label: 'Keseluruhan',
                         data: [totalAnswered, totalCorrect, totalIncorrect],
                         backgroundColor: ['#6366f1', '#22c55e', '#ef4444'],
                         borderColor: ['#4f46e5', '#16a34a', '#dc2626'],
                         borderWidth: 1
                     }]
-                },
-                options: {
-                    scales: { y: { beginAtZero: true, ticks: { color: '#1e293b' } }, x: { ticks: { color: '#1e293b' } } },
-                    plugins: { 
-                        title: { display: true, text: 'Hasil Akhir Keseluruhan', color: '#1e293b', font: { size: 16 }},
-                        legend: { display: false }
-                    }
                 }
             });
             activeCharts.push(totalChart);
         }
         
-        // Fungsi menampilkan tinjauan
         function showReview() {
             showScreen('review');
             reviewContainer.innerHTML = '';
-            reviewContainer.scrollTop = 0;
             
             const answeredQuestionIds = Object.keys(userAnswers).map(Number).sort((a, b) => a - b);
 
@@ -2759,7 +2684,6 @@
 
                 const userAnswer = userAnswers[q.id];
                 const isCorrect = userAnswer === q.answer;
-                
                 const reviewClass = isCorrect ? 'correct-review' : 'incorrect-review';
 
                 const questionRow = document.createElement('div');
@@ -2767,32 +2691,16 @@
                 questionRow.innerHTML = `
                     <span class="expression">${q.left}</span>
                     <div class="answer-buttons">
-                        <button data-symbol="<">&lt;</button>
-                        <button data-symbol="=">=</button>
-                        <button data-symbol=">">&gt;</button>
+                        <button data-symbol="<" class="${q.answer === '<' ? 'correct-answer' : ''} ${userAnswer === '<' && !isCorrect ? 'incorrect-answer user-answer' : userAnswer === '<' ? 'user-answer' : ''}">&lt;</button>
+                        <button data-symbol="=" class="${q.answer === '=' ? 'correct-answer' : ''} ${userAnswer === '=' && !isCorrect ? 'incorrect-answer user-answer' : userAnswer === '=' ? 'user-answer' : ''}">=</button>
+                        <button data-symbol=">" class="${q.answer === '>' ? 'correct-answer' : ''} ${userAnswer === '>' && !isCorrect ? 'incorrect-answer user-answer' : userAnswer === '>' ? 'user-answer' : ''}">&gt;</button>
                     </div>
                     <span class="expression">${q.right}</span>
                 `;
-                
-                const buttons = questionRow.querySelectorAll('.answer-buttons button');
-                buttons.forEach(btn => {
-                    const symbol = btn.dataset.symbol;
-                    if (symbol === q.answer) {
-                        btn.classList.add('correct-answer');
-                    }
-                    if (symbol === userAnswer) {
-                        btn.classList.add('user-answer');
-                        if (!isCorrect) {
-                           btn.classList.add('incorrect-answer'); 
-                        }
-                    }
-                });
-                
                 reviewContainer.appendChild(questionRow);
             });
         }
 
-        // Fungsi reset kuis
         function resetQuiz() {
             currentSection = 0;
             userAnswers = {};
@@ -2800,29 +2708,6 @@
             results = Array.from({ length: TOTAL_SECTIONS }, () => ({ answered: 0, correct: 0, incorrect: 0 }));
             clearInterval(timerInterval);
         }
-
-        // Fungsi cek password
-        function checkPassword() {
-            const password = passwordInput.value;
-            if (password === 'dhikasatya','S7') {
-                showScreen('start');
-            } else {
-                passwordInput.classList.add('error');
-                passwordError.classList.remove('hidden');
-            }
-        }
-
-        // Event Listeners
-        passwordSubmitBtn.addEventListener('click', checkPassword);
-        passwordInput.addEventListener('keyup', (e) => {
-             if (e.key === 'Enter') {
-                 checkPassword();
-             }
-        });
-        passwordInput.addEventListener('input', () => {
-            passwordInput.classList.remove('error');
-            passwordError.classList.add('hidden');
-        });
 
         startBtn.addEventListener('click', () => {
             resetQuiz();
@@ -2858,16 +2743,13 @@
         });
 
         questionsContainer.addEventListener('click', handleAnswer);
-        
         retryBtn.addEventListener('click', () => {
             resetQuiz();
             showScreen('start');
         });
 
-        // Inisialisasi
         parseQuestions();
-        showScreen('password');
+        showScreen('start');
     </script>
-
 </body>
 </html>
