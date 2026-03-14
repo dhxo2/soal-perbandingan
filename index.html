@@ -199,7 +199,7 @@
             border-color: var(--accent-color);
         }
 
-        /* Review Colors (CRITICAL FIX) */
+        /* Review Styles */
         .question-row.correct-review { border-color: var(--correct-color); background-color: #ecfdf5; }
         .question-row.incorrect-review { border-color: var(--incorrect-color); background-color: #fef2f2; }
         .question-row.unanswered-review { border-color: #9ca3af; background-color: #f9fafb; opacity: 0.8; }
@@ -245,6 +245,7 @@
                 <ul>
                     <li>Pilih jawaban yang tepat (&lt;, =, &gt;).</li>
                     <li>Waktu akan terus berjalan untuk setiap bagian.</li>
+                    <li>Soal yang sudah dijawab <strong>tidak akan muncul kembali</strong> di bagian berikutnya.</li>
                     <li>Hasil akhir berupa statistik akurasi per bagian.</li>
                 </ul>
             </div>
@@ -317,7 +318,7 @@
     <div id="confirm-modal" class="modal-overlay hidden">
         <div class="modal">
             <h2 style="color:var(--incorrect-color)">⚠️ Perhatian!</h2>
-            <p>Waktu pengerjaan akan segera dimulai. Waktu <strong>tidak dapat dijeda</strong> dan akan terus berjalan hingga sesi berakhir.</p>
+            <p>Waktu pengerjaan akan segera dimulai. Waktu <strong>tidak dapat dijeda</strong> dan soal yang sudah dijawab tidak akan muncul lagi.</p>
             <div class="modal-btns" style="display:flex; gap:10px">
                 <button id="modal-cancel" class="btn" style="flex:1">Batal</button>
                 <button id="modal-confirm" class="btn active" style="flex:1">Saya Siap!</button>
@@ -377,7 +378,7 @@
 48. (2 ÷ -21) <=> (-6 ÷ 25) <
 49. (12 × -6) <=> (16 × 8) <
 50. (-56.84 + -25.93) <=> (-28.12 + -60.12) <
- 51. (-9^4) <=> (-6^5) >
+51. (-9^4) <=> (-6^5) >
 52. (√281) <=> (√392) <
 53. ((-4 × 7) + (6^0)) <=> ((√12) + (55 ÷ 5)) <
 54. (54 ÷ -25) <=> (-50 ÷ 4) >
@@ -2335,7 +2336,7 @@
         let isShuffled = true;
         let timePerSection = 30;
         let results = [];
-        let userAnswers = {};
+        let userAnswers = {}; // Menyimpan semua jawaban: { id: '<' }
         let activeCharts = [];
         let answeredInSection = [new Set(), new Set(), new Set(), new Set()];
 
@@ -2378,7 +2379,17 @@
             container.innerHTML = '';
             document.getElementById('bagian-title').textContent = `Bagian ${idx + 1}`;
             
-            let pool = [...allQuestions];
+            // FILTER: Hanya ambil soal yang BELUM ada di userAnswers
+            let pool = allQuestions.filter(q => !userAnswers.hasOwnProperty(q.id));
+            
+            if (pool.length === 0) {
+                // Jika semua soal sudah habis terjawab sebelum bagian 4 selesai
+                clearInterval(timerInterval);
+                processResults();
+                showResults();
+                return;
+            }
+
             if (isShuffled) shuffle(pool);
             
             pool.forEach(q => {
@@ -2387,9 +2398,9 @@
                 row.innerHTML = `
                     <div class="expression">${q.left}</div>
                     <div class="answer-buttons">
-                        <button data-qid="${q.id}" data-val="<" class="${userAnswers[q.id] === '<' ? 'selected' : ''}">&lt;</button>
-                        <button data-qid="${q.id}" data-val="=" class="${userAnswers[q.id] === '=' ? 'selected' : ''}">=</button>
-                        <button data-qid="${q.id}" data-val=">" class="${userAnswers[q.id] === '>' ? 'selected' : ''}">&gt;</button>
+                        <button data-qid="${q.id}" data-val="<">&lt;</button>
+                        <button data-qid="${q.id}" data-val="=">=</button>
+                        <button data-qid="${q.id}" data-val=">">&gt;</button>
                     </div>
                     <div class="expression">${q.right}</div>
                 `;
@@ -2415,15 +2426,15 @@
         }
 
         function processResults() {
-            const answeredIds = answeredInSection[currentSection];
+            const answeredIdsInThisSection = answeredInSection[currentSection];
             let correct = 0;
-            answeredIds.forEach(id => {
+            answeredIdsInThisSection.forEach(id => {
                 if (userAnswers[id] === allQuestions[id].answer) correct++;
             });
             results[currentSection] = {
-                total: answeredIds.size,
+                total: answeredIdsInThisSection.size,
                 correct: correct,
-                incorrect: answeredIds.size - correct
+                incorrect: answeredIdsInThisSection.size - correct
             };
         }
 
@@ -2452,7 +2463,9 @@
         }
 
         function createChart(id, label, data) {
-            const ctx = document.getElementById(id).getContext('2d');
+            const canvas = document.getElementById(id);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             activeCharts.push(new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -2479,7 +2492,6 @@
             const container = document.getElementById('review-container');
             container.innerHTML = '';
             
-            // Dapatkan semua soal yang dijawab, urutkan berdasarkan ID asli
             const answeredIds = Object.keys(userAnswers).map(Number).sort((a, b) => a - b);
 
             if (answeredIds.length === 0) {
@@ -2567,4 +2579,5 @@
     </script>
 </body>
 </html>
+
 
