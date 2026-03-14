@@ -40,7 +40,6 @@
             transition: max-width 0.3s ease;
         }
 
-        /* Mode Layout Styles */
         .container.laptop-mode { max-width: 1200px; }
         .container.mobile-mode { max-width: 600px; }
 
@@ -58,7 +57,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Layar Awal */
         #start-screen { text-align: center; justify-content: center; }
         #start-screen h1 { color: var(--accent-color); font-size: 2rem; margin-bottom: 10px; font-weight: 800; }
 
@@ -93,6 +91,8 @@
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn.active {
@@ -110,9 +110,10 @@
             border-radius: 12px;
             margin-top: 25px;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            border: none;
         }
 
-        /* Modal Overlay */
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -134,12 +135,7 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
-        .modal h2 { color: var(--incorrect-color); margin-top: 0; }
-        .modal p { line-height: 1.5; margin-bottom: 20px; }
-        .modal-btns { display: flex; gap: 10px; }
-        .modal-btns button { flex: 1; }
-
-        /* Kuis */
+        /* Quiz Header */
         .quiz-header {
             display: flex;
             justify-content: space-between;
@@ -161,19 +157,15 @@
             border-radius: 10px;
         }
 
-        #questions-container {
+        /* Question Grid */
+        #questions-container, #review-container {
             display: grid;
             gap: 12px;
             padding: 20px;
         }
 
-        /* Adaptive Grid Soal */
-        .laptop-mode #questions-container {
+        .laptop-mode #questions-container, .laptop-mode #review-container {
             grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-        }
-
-        .mobile-mode #questions-container {
-            grid-template-columns: 1fr;
         }
 
         .question-row {
@@ -184,9 +176,10 @@
             padding: 15px;
             background: var(--secondary-color);
             border-radius: 12px;
+            border: 2px solid transparent;
         }
 
-        .expression { text-align: center; font-family: monospace; font-weight: bold; font-size: 1rem; }
+        .expression { text-align: center; font-family: monospace; font-weight: bold; font-size: 1rem; word-break: break-all; }
 
         .answer-buttons { display: flex; gap: 5px; }
         .answer-buttons button {
@@ -195,7 +188,9 @@
             border: 1px solid #d1d5db;
             background: white;
             font-weight: bold;
+            font-size: 1.1rem;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .answer-buttons button.selected {
@@ -204,14 +199,34 @@
             border-color: var(--accent-color);
         }
 
-        /* Hasil & Grafik */
+        /* Review Colors (CRITICAL FIX) */
+        .question-row.correct-review { border-color: var(--correct-color); background-color: #ecfdf5; }
+        .question-row.incorrect-review { border-color: var(--incorrect-color); background-color: #fef2f2; }
+        .question-row.unanswered-review { border-color: #9ca3af; background-color: #f9fafb; opacity: 0.8; }
+
+        .correct-answer { 
+            background-color: var(--correct-color) !important; 
+            color: white !important; 
+            border-color: var(--correct-color) !important; 
+        }
+        .incorrect-answer { 
+            background-color: var(--incorrect-color) !important; 
+            color: white !important; 
+            border-color: var(--incorrect-color) !important; 
+        }
+        .user-answer { 
+            outline: 3px solid var(--text-color); 
+            outline-offset: 2px; 
+            z-index: 1;
+        }
+
+        /* Results */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
-
         .chart-container { background: var(--secondary-color); padding: 15px; border-radius: 12px; min-height: 250px; }
 
         .hidden { display: none !important; }
@@ -293,7 +308,7 @@
                 <div style="font-weight:bold">Tinjauan Soal</div>
                 <button id="back-to-results-btn" class="btn" style="padding:5px 15px">Tutup</button>
             </div>
-            <div id="review-container" style="padding:20px"></div>
+            <div id="review-container"></div>
         </div>
 
     </div>
@@ -301,11 +316,11 @@
     <!-- Confirmation Modal -->
     <div id="confirm-modal" class="modal-overlay hidden">
         <div class="modal">
-            <h2>⚠️ Perhatian!</h2>
+            <h2 style="color:var(--incorrect-color)">⚠️ Perhatian!</h2>
             <p>Waktu pengerjaan akan segera dimulai. Waktu <strong>tidak dapat dijeda</strong> dan akan terus berjalan hingga sesi berakhir.</p>
-            <div class="modal-btns">
-                <button id="modal-cancel" class="btn">Batal</button>
-                <button id="modal-confirm" class="btn active">Saya Siap!</button>
+            <div class="modal-btns" style="display:flex; gap:10px">
+                <button id="modal-cancel" class="btn" style="flex:1">Batal</button>
+                <button id="modal-confirm" class="btn active" style="flex:1">Saya Siap!</button>
             </div>
         </div>
     </div>
@@ -362,7 +377,7 @@
 48. (2 ÷ -21) <=> (-6 ÷ 25) <
 49. (12 × -6) <=> (16 × 8) <
 50. (-56.84 + -25.93) <=> (-28.12 + -60.12) <
-51. (-9^4) <=> (-6^5) >
+ 51. (-9^4) <=> (-6^5) >
 52. (√281) <=> (√392) <
 53. ((-4 × 7) + (6^0)) <=> ((√12) + (55 ÷ 5)) <
 54. (54 ÷ -25) <=> (-50 ÷ 4) >
@@ -2340,11 +2355,11 @@
         function parseQuestions() {
             const lines = rawQuestions.trim().split('\n');
             allQuestions = lines.map((line, idx) => {
-                const [eq, ans] = line.split('<=>');
+                const [eq, ansPart] = line.split('<=>');
                 const left = eq.replace(/^\d+\.\s*/, '').trim();
-                const rightPart = ans.trim().split(' ');
-                const answer = rightPart.pop();
-                const right = rightPart.join(' ');
+                const rightSplit = ansPart.trim().split(' ');
+                const answer = rightSplit.pop();
+                const right = rightSplit.join(' ');
                 return { id: idx, left, right, answer };
             });
         }
@@ -2372,15 +2387,14 @@
                 row.innerHTML = `
                     <div class="expression">${q.left}</div>
                     <div class="answer-buttons">
-                        <button data-qid="${q.id}" data-val="<">&lt;</button>
-                        <button data-qid="${q.id}" data-val="=">=</button>
-                        <button data-qid="${q.id}" data-val=">">&gt;</button>
+                        <button data-qid="${q.id}" data-val="<" class="${userAnswers[q.id] === '<' ? 'selected' : ''}">&lt;</button>
+                        <button data-qid="${q.id}" data-val="=" class="${userAnswers[q.id] === '=' ? 'selected' : ''}">=</button>
+                        <button data-qid="${q.id}" data-val=">" class="${userAnswers[q.id] === '>' ? 'selected' : ''}">&gt;</button>
                     </div>
                     <div class="expression">${q.right}</div>
                 `;
                 container.appendChild(row);
             });
-
             startTimer();
         }
 
@@ -2419,9 +2433,9 @@
             activeCharts = [];
 
             const total = results.reduce((a, b) => ({
-                total: a.total + b.total,
-                correct: a.correct + b.correct,
-                incorrect: a.incorrect + b.incorrect
+                total: a.total + (b ? b.total : 0),
+                correct: a.correct + (b ? b.correct : 0),
+                incorrect: a.incorrect + (b ? b.incorrect : 0)
             }), {total:0, correct:0, incorrect:0});
 
             document.getElementById('results-summary').innerHTML = `
@@ -2432,7 +2446,9 @@
             `;
 
             createChart('chart-total', 'Akurasi Total', [total.correct, total.incorrect]);
-            results.forEach((r, i) => createChart(`chart-bagian${i+1}`, `Bagian ${i+1}`, [r.correct, r.incorrect]));
+            results.forEach((r, i) => {
+                if(r) createChart(`chart-bagian${i+1}`, `Bagian ${i+1}`, [r.correct, r.incorrect]);
+            });
         }
 
         function createChart(id, label, data) {
@@ -2463,20 +2479,33 @@
             const container = document.getElementById('review-container');
             container.innerHTML = '';
             
-            Object.keys(userAnswers).forEach(qid => {
+            // Dapatkan semua soal yang dijawab, urutkan berdasarkan ID asli
+            const answeredIds = Object.keys(userAnswers).map(Number).sort((a, b) => a - b);
+
+            if (answeredIds.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6">Belum ada soal yang dijawab.</div>';
+                return;
+            }
+
+            answeredIds.forEach(qid => {
                 const q = allQuestions[qid];
                 const uAns = userAnswers[qid];
                 const isCorrect = uAns === q.answer;
                 
                 const row = document.createElement('div');
                 row.className = `question-row ${isCorrect ? 'correct-review' : 'incorrect-review'}`;
-                row.style.marginBottom = '10px';
                 row.innerHTML = `
                     <div class="expression">${q.left}</div>
                     <div class="answer-buttons">
-                        ${['<','=','>'].map(v => `
-                            <button class="${q.answer === v ? 'correct-answer' : ''} ${uAns === v && !isCorrect ? 'incorrect-answer' : ''} ${uAns === v ? 'user-answer' : ''}">${v}</button>
-                        `).join('')}
+                        ${['<','=','>'].map(v => {
+                            let cls = '';
+                            if (q.answer === v) cls += 'correct-answer ';
+                            if (uAns === v) {
+                                cls += 'user-answer ';
+                                if (uAns !== q.answer) cls += 'incorrect-answer ';
+                            }
+                            return `<button class="${cls}" disabled>${v}</button>`;
+                        }).join('')}
                     </div>
                     <div class="expression">${q.right}</div>
                 `;
@@ -2484,7 +2513,7 @@
             });
         }
 
-        // Layout Selection
+        // Event Listeners
         document.getElementById('mode-laptop-btn').addEventListener('click', () => {
             layoutContainer.className = 'container laptop-mode';
             document.getElementById('mode-laptop-btn').classList.add('active');
@@ -2497,13 +2526,11 @@
             document.getElementById('mode-laptop-btn').classList.remove('active');
         });
 
-        // Config Listeners
         document.getElementById('shuffle-on-btn').addEventListener('click', () => { isShuffled = true; document.getElementById('shuffle-on-btn').classList.add('active'); document.getElementById('shuffle-off-btn').classList.remove('active'); });
         document.getElementById('shuffle-off-btn').addEventListener('click', () => { isShuffled = false; document.getElementById('shuffle-off-btn').classList.add('active'); document.getElementById('shuffle-on-btn').classList.remove('active'); });
         document.getElementById('duration-30-btn').addEventListener('click', () => { timePerSection = 30; document.getElementById('duration-30-btn').classList.add('active'); document.getElementById('duration-60-btn').classList.remove('active'); });
         document.getElementById('duration-60-btn').addEventListener('click', () => { timePerSection = 60; document.getElementById('duration-60-btn').classList.add('active'); document.getElementById('duration-30-btn').classList.remove('active'); });
 
-        // Start Flow with Modal
         document.getElementById('start-btn').addEventListener('click', () => {
             document.getElementById('confirm-modal').classList.remove('hidden');
         });
@@ -2521,13 +2548,12 @@
             loadSection(0);
         });
 
-        // Answer Selection
         document.getElementById('questions-container').addEventListener('click', e => {
             if (e.target.tagName === 'BUTTON') {
                 const qid = e.target.dataset.qid;
                 const val = e.target.dataset.val;
                 userAnswers[qid] = val;
-                answeredInSection[currentSection].add(qid);
+                answeredInSection[currentSection].add(parseInt(qid));
                 const parent = e.target.parentElement;
                 [...parent.children].forEach(b => b.classList.toggle('selected', b === e.target));
             }
