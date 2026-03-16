@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Latihan Soal Perbandingan</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Pustaka untuk konversi HTML ke Gambar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --bg-color: #f0f2f5;
             --primary-color: #ffffff;
             --secondary-color: #f3f4f6;
             --accent-color: #6366f1;
+            --download-color: #10b981;
             --text-color: #1f2937;
             --correct-color: #10b981;
             --incorrect-color: #ef4444;
@@ -93,12 +96,19 @@
             transition: all 0.2s;
             text-decoration: none;
             display: inline-block;
+            text-align: center;
         }
 
         .btn.active {
             background-color: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
+        }
+
+        .btn-download {
+            background-color: var(--download-color);
+            color: white;
+            margin-bottom: 10px;
         }
 
         #start-btn {
@@ -221,6 +231,11 @@
         }
 
         /* Results */
+        .results-capture-area {
+            background-color: white;
+            padding: 10px;
+            border-radius: 12px;
+        }
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -228,6 +243,19 @@
             margin-top: 20px;
         }
         .chart-container { background: var(--secondary-color); padding: 15px; border-radius: 12px; min-height: 250px; }
+
+        /* Loader for Download */
+        #download-loader {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
 
         .hidden { display: none !important; }
     </style>
@@ -289,15 +317,21 @@
         <!-- Results Screen -->
         <div id="results-screen" class="screen hidden">
             <h1 style="text-align:center">Statistik Hasil</h1>
-            <div id="results-summary"></div>
-            <div class="charts-grid">
-                <div class="chart-container"><canvas id="chart-total"></canvas></div>
-                <div class="chart-container"><canvas id="chart-bagian1"></canvas></div>
-                <div class="chart-container"><canvas id="chart-bagian2"></canvas></div>
-                <div class="chart-container"><canvas id="chart-bagian3"></canvas></div>
-                <div class="chart-container"><canvas id="chart-bagian4"></canvas></div>
+            
+            <!-- Area yang akan ditangkap sebagai gambar -->
+            <div id="capture-area" class="results-capture-area">
+                <div id="results-summary"></div>
+                <div class="charts-grid">
+                    <div class="chart-container"><canvas id="chart-total"></canvas></div>
+                    <div class="chart-container"><canvas id="chart-bagian1"></canvas></div>
+                    <div class="chart-container"><canvas id="chart-bagian2"></canvas></div>
+                    <div class="chart-container"><canvas id="chart-bagian3"></canvas></div>
+                    <div class="chart-container"><canvas id="chart-bagian4"></canvas></div>
+                </div>
             </div>
-            <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px">
+
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px; padding-bottom: 20px;">
+                <button id="download-jpg-btn" class="btn btn-download">📥 Unduh Hasil (JPG)</button>
                 <button id="review-btn" class="btn active">Tinjau Jawaban</button>
                 <button id="retry-btn" class="btn">Coba Lagi</button>
             </div>
@@ -324,6 +358,12 @@
                 <button id="modal-confirm" class="btn active" style="flex:1">Saya Siap!</button>
             </div>
         </div>
+    </div>
+
+    <!-- Loader Unduh -->
+    <div id="download-loader" class="hidden">
+        <div style="margin-bottom: 10px;">Menyiapkan Gambar...</div>
+        <div style="font-size: 0.8rem; opacity: 0.8;">Mohon tunggu sebentar</div>
     </div>
 
     <script>
@@ -2336,7 +2376,7 @@
         let isShuffled = true;
         let timePerSection = 30;
         let results = [];
-        let userAnswers = {}; // Menyimpan semua jawaban: { id: '<' }
+        let userAnswers = {};
         let activeCharts = [];
         let answeredInSection = [new Set(), new Set(), new Set(), new Set()];
 
@@ -2379,11 +2419,9 @@
             container.innerHTML = '';
             document.getElementById('bagian-title').textContent = `Bagian ${idx + 1}`;
             
-            // FILTER: Hanya ambil soal yang BELUM ada di userAnswers
             let pool = allQuestions.filter(q => !userAnswers.hasOwnProperty(q.id));
             
             if (pool.length === 0) {
-                // Jika semua soal sudah habis terjawab sebelum bagian 4 selesai
                 clearInterval(timerInterval);
                 processResults();
                 showResults();
@@ -2525,6 +2563,47 @@
             });
         }
 
+        /**
+         * Fungsi untuk mengunduh hasil sebagai gambar JPG
+         */
+        async function downloadResults() {
+            const target = document.getElementById('capture-area');
+            const loader = document.getElementById('download-loader');
+            
+            // Tampilkan loader
+            loader.classList.remove('hidden');
+
+            try {
+                // Konversi DOM ke Canvas
+                const canvas = await html2canvas(target, {
+                    backgroundColor: '#ffffff',
+                    scale: 2, // Kualitas lebih tinggi
+                    logging: false,
+                    useCORS: true
+                });
+
+                // Ubah canvas ke format gambar
+                const image = canvas.toDataURL("image/jpeg", 0.9);
+                
+                // Buat link unduh sementara
+                const link = document.createElement('a');
+                link.download = `Statistik_Latihan_Perbandingan_${new Date().getTime()}.jpg`;
+                link.href = image;
+                
+                // Trigger klik unduh
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (err) {
+                console.error("Gagal mengunduh gambar:", err);
+                // Tidak menggunakan alert, tampilkan pesan di konsol saja
+            } finally {
+                // Sembunyikan loader
+                loader.classList.add('hidden');
+            }
+        }
+
         // Event Listeners
         document.getElementById('mode-laptop-btn').addEventListener('click', () => {
             layoutContainer.className = 'container laptop-mode';
@@ -2571,6 +2650,9 @@
             }
         });
 
+        // Download Listener
+        document.getElementById('download-jpg-btn').addEventListener('click', downloadResults);
+
         document.getElementById('retry-btn').addEventListener('click', () => showScreen('start'));
         document.getElementById('review-btn').addEventListener('click', showReview);
         document.getElementById('back-to-results-btn').addEventListener('click', () => showScreen('results'));
@@ -2579,5 +2661,3 @@
     </script>
 </body>
 </html>
-
-
